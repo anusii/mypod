@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rtk ls *)",
+      "Bash(rtk grep *)",
+      "Bash(rtk read *)",
+      "Bash(rtk git *)",
+      "Bash(rtk find *)",
+      "Bash(bash support/loc.sh lib/src/widgets/grant_permission_form.dart)",
+      "Bash(flutter pub *)",
+      "Bash(flutter analyze *)",
+      "Bash(bash support/loc.sh lib/src/widgets/grant_permission_form.dart lib/src/widgets/grant_permission_notify.dart)",
+      "Bash(bash support/loc.sh -n 0 lib/src/widgets/grant_permission_form.dart lib/src/widgets/grant_permission_notify.dart)",
+      "Bash(rtk make *)"
+    ]
+  }
+}
