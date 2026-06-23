@@ -40,8 +40,7 @@ const String appTitle = 'MyPod - Manage your Solid Pod';
 /// `web/client-profile.jsonld` in this repository and is published with the
 /// web build.
 
-const String clientId =
-    'https://anusii.github.io/mypod/client-profile.jsonld';
+const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
 
 /// Redirect URIs offered to the Solid-OIDC flow, one format per platform.
 ///
