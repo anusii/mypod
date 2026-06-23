@@ -28,7 +28,6 @@ import 'package:flutter/material.dart';
 import 'package:solidui/solidui.dart';
 
 import 'package:mypod/constants/app.dart';
-import 'package:mypod/home.dart';
 import 'package:mypod/screens/domains.dart';
 import 'package:mypod/screens/manage_account.dart';
 
@@ -50,18 +49,6 @@ class AppScaffold extends StatelessWidget {
       enableProfile: true,
       onLogout: (context) => SolidAuthHandler.instance.handleLogout(context),
       menu: const [
-        SolidMenuItem(
-          icon: Icons.home,
-          title: 'Home',
-          tooltip: '''
-
-            **Home**
-
-            Tap here to return to the main page for the app.
-
-            ''',
-          child: Home(title: appTitle),
-        ),
         SolidMenuItem(
           icon: Icons.manage_accounts,
           title: 'Account',
@@ -96,15 +83,6 @@ class AppScaffold extends StatelessWidget {
           showUpdateButton: true,
           downloadUrl: 'https://solidcommunity.au/installers/',
         ),
-        actions: [
-          SolidAppBarAction(
-            icon: Icons.dns,
-            onPressed: () => _scaffoldController.navigateToSubpage(
-              const Domains(),
-            ),
-            tooltip: 'Domains',
-          ),
-        ],
       ),
       statusBar: const SolidStatusBarConfig(
         serverInfo: SolidServerInfo(serverUri: SolidConfig.defaultServerUrl),
@@ -125,36 +103,32 @@ class AppScaffold extends StatelessWidget {
         ''',
         text: '''
 
-        MyPod is an app-independent tool for managing your Solid account on a
-        Community Solid Server. It talks to the server's account management
+        MyPod is an app-independent tool for managing your Solid account on
+        a Community Solid Server. It talks to the server's account management
         API directly, so you can administer your Pods without leaving the app.
 
-        Key features:
+        ### Key features
 
-        🆕 Create a new account on a Solid server with a named Pod;
-
-        🔑 Change the password of your Solid account on the server;
-
-        🗂️ List all of the domains (apps) hosted on that Solid server;
-
-        🪪 Edit each app profile, display name, visibility, and avatar;
-
-        🎨 Theme switching (light/dark/system);
-
-        🧭 Responsive navigation (rail ↔ drawer).
+        - Create a new Solid account with a named Pod on a Solid server
+        - Change the password of your Solid account on the server
+        - List all domains (apps) hosted on your Solid server
+        - Edit each app profile, display name, visibility, and avatar
+        - Theme switching (light / dark / system)
+        - Responsive navigation (rail and drawer)
 
         For more information, visit the
         [MyPod](https://github.com/anusii/mypod) GitHub repository and our
         [Australian Solid Community](https://solidcommunity.au) web site.
 
         ''',
+        readmeUrl: 'https://anusii.github.io/mypod',
       ),
       themeToggle: const SolidThemeToggleConfig(
         enabled: true,
         showInAppBarActions: true,
       ),
       inviteConfig: inviteOthersConfig,
-      child: const Home(title: appTitle),
+      child: const ManageAccount(),
     );
   }
 }
