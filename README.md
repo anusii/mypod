@@ -159,7 +159,7 @@ server, so they are publicly reachable by every login server. The two
 files live in the Flutter `web/` folder, so `flutter build web`
 publishes them automatically:
 
-```
+```bash
 web/
 ├── client-profile.jsonld   → https://anusii.github.io/mypod/client-profile.jsonld
 └── redirect.html           → https://anusii.github.io/mypod/redirect.html
