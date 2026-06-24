@@ -226,6 +226,7 @@ these and try again.
 
 ## Authors
 
++ Graham Williams
 + Tony Chen
 
 For more information about Solid and PODs, visit
