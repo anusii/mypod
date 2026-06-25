@@ -94,7 +94,15 @@ class _DomainsState extends State<Domains> {
       final (subDirs: subDirs, files: _) =
           await getResourcesInContainer(podRoot);
 
-      final names = subDirs.map(_folderName).where((n) => n.isNotEmpty).toList()
+      // Keep only genuine POD applications. Some containers under the Pod
+      // root are not apps but storage folders named with a UUID-style
+      // hexadecimal code, or reserved folders such as `profile`; these are
+      // filtered out so the list shows only app domains.
+
+      final names = subDirs
+          .map(_folderName)
+          .where((n) => n.isNotEmpty && !_isUuidName(n) && !_isReservedName(n))
+          .toList()
         ..sort();
 
       if (!mounted) return;
@@ -119,6 +127,29 @@ class _DomainsState extends State<Domains> {
     final segments = Uri.parse(trimmed).pathSegments;
     return segments.isEmpty ? '' : segments.last;
   }
+
+  // Matches a canonical UUID, i.e. a fixed-length hexadecimal code in the
+  // 8-4-4-4-12 form.
+
+  static final RegExp _uuidPattern = RegExp(
+    r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+    caseSensitive: false,
+  );
+
+  // Whether a folder name is a UUID-style code rather than a POD app domain.
+  // Such folders are storage containers, not applications, so they are
+  // excluded from the domains list.
+
+  bool _isUuidName(String name) => _uuidPattern.hasMatch(name);
+
+  // Reserved folder names that are part of the Pod's own structure rather
+  // than POD applications (e.g. the `profile` container), so they are
+  // excluded from the domains list.
+
+  static const Set<String> _reservedNames = {'profile'};
+
+  bool _isReservedName(String name) =>
+      _reservedNames.contains(name.toLowerCase());
 
   // Open the shared profile editor. This is the same dialog that
   // is reachable from the avatar menu in the top-right of the app, so the
