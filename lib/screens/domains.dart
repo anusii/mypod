@@ -96,12 +96,12 @@ class _DomainsState extends State<Domains> {
 
       // Keep only genuine POD applications. Some containers under the Pod
       // root are not apps but storage folders named with a UUID-style
-      // hexadecimal code; these are filtered out so the list shows only app
-      // domains.
+      // hexadecimal code, or reserved folders such as `profile`; these are
+      // filtered out so the list shows only app domains.
 
       final names = subDirs
           .map(_folderName)
-          .where((n) => n.isNotEmpty && !_isUuidName(n))
+          .where((n) => n.isNotEmpty && !_isUuidName(n) && !_isReservedName(n))
           .toList()
         ..sort();
 
@@ -141,6 +141,15 @@ class _DomainsState extends State<Domains> {
   // excluded from the domains list.
 
   bool _isUuidName(String name) => _uuidPattern.hasMatch(name);
+
+  // Reserved folder names that are part of the Pod's own structure rather
+  // than POD applications (e.g. the `profile` container), so they are
+  // excluded from the domains list.
+
+  static const Set<String> _reservedNames = {'profile'};
+
+  bool _isReservedName(String name) =>
+      _reservedNames.contains(name.toLowerCase());
 
   // Open the shared profile editor. This is the same dialog that
   // is reachable from the avatar menu in the top-right of the app, so the
