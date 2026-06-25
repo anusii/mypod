@@ -18,6 +18,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  file_picker: ^11.0.2
   solidpod: ^1.0.10
   solidui: ^1.0.11
   window_manager: ^0.5.1
@@ -25,6 +26,12 @@ dependencies:
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
+
+dependency_overrides:
+  solidpod:
+    git:
+      url: https://github.com/anusii/solidpod.git
+      ref: tony/7_edit_profile
 
 flutter:
   assets:
