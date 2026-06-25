@@ -26,8 +26,10 @@ library;
 import 'package:flutter/material.dart';
 
 import 'package:solidpod/solidpod.dart'
-    show getResourcesInContainer, getWebId, isUserLoggedIn;
+    show SolidConstants, getResourcesInContainer, getWebId, isUserLoggedIn;
 import 'package:solidui/solidui.dart';
+
+import 'package:mypod/dialogs/edit_app_profile.dart';
 
 // Each top-level folder under a user's Pod root corresponds to an
 // app (a "domain") that has stored data on the Pod. This screen enumerates
@@ -142,13 +144,29 @@ class _DomainsState extends State<Domains> {
 
   bool _isUuidName(String name) => _uuidPattern.hasMatch(name);
 
-  // Open the shared profile editor. This is the same dialog that
-  // is reachable from the avatar menu in the top-right of the app, so the
-  // editing experience (display name, public/private visibility, and avatar
-  // upload/delete) is identical regardless of where it is launched from.
+  // Open the profile editor for a single app/domain.
+  //
+  // Each app keeps its own profile under its own folder, so editing must target
+  // the clicked app specifically rather than a shared profile. MyPod's own
+  // folder is a special case: the user is already signed in to MyPod, so its
+  // security key is unlocked and we reuse the standard in-app editor (the same
+  // dialog reachable from the avatar menu). Every other app needs its own
+  // security key, so it opens the per-app editor, which prompts for that key
+  // and reads/writes that app's profile independently.
 
-  Future<void> _editProfile() async {
-    await SolidProfileEditor.show(context);
+  Future<void> _editProfile(String domainName) async {
+    if (domainName == SolidConstants.directories.app) {
+      await SolidProfileEditor.show(context);
+      return;
+    }
+
+    final appRootUrl = '$_podRoot$domainName/';
+    if (!mounted) return;
+    await EditAppProfileDialog.show(
+      context,
+      appRootUrl: appRootUrl,
+      appName: domainName,
+    );
   }
 
   @override
@@ -256,7 +274,7 @@ class _DomainsState extends State<Domains> {
               title: Text(domains[i]),
               subtitle: const Text('App domain on your Pod'),
               trailing: TextButton.icon(
-                onPressed: _editProfile,
+                onPressed: () => _editProfile(domains[i]),
                 icon: const Icon(Icons.edit),
                 label: const Text('Edit Profile'),
               ),
