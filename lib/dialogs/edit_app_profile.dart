@@ -203,8 +203,7 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
 
   Future<void> _loadProfile() async {
     try {
-      final profile =
-          await readAppProfile(widget.appRootUrl, key: _appKey);
+      final profile = await readAppProfile(widget.appRootUrl, key: _appKey);
       if (!mounted) return;
       setState(() {
         _originalName = profile.displayName ?? '';
@@ -229,8 +228,8 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
 
   bool get _hasChanges {
     final nameChanged = _nameController.text.trim() != _originalName;
-    final avatarChanged = _avatarRemoved ||
-        !identical(_pendingAvatar, _originalAvatar);
+    final avatarChanged =
+        _avatarRemoved || !identical(_pendingAvatar, _originalAvatar);
     final privacyChanged = _private != _originalPrivate;
     return nameChanged || avatarChanged || privacyChanged;
   }
@@ -286,18 +285,17 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
       // the file is re-encrypted / decrypted under the new mode).
 
       final nameChanged = name != _originalName;
-      final displayName = (name.isNotEmpty && (nameChanged || privacyChanged))
-          ? name
-          : null;
+      final displayName =
+          (name.isNotEmpty && (nameChanged || privacyChanged)) ? name : null;
 
       // Likewise for the avatar.
 
       final avatarChanged = !identical(_pendingAvatar, _originalAvatar);
-      final avatarBytes =
-          (!_avatarRemoved && _pendingAvatar != null &&
-                  (avatarChanged || privacyChanged))
-              ? _pendingAvatar
-              : null;
+      final avatarBytes = (!_avatarRemoved &&
+              _pendingAvatar != null &&
+              (avatarChanged || privacyChanged))
+          ? _pendingAvatar
+          : null;
 
       await writeAppProfile(
         widget.appRootUrl,
@@ -390,8 +388,7 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             TextButton(
-              onPressed:
-                  _verifying ? null : () => Navigator.of(context).pop(),
+              onPressed: _verifying ? null : () => Navigator.of(context).pop(),
               child: const Text('Cancel'),
             ),
             const SizedBox(width: 8),
