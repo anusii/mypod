@@ -31,6 +31,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:solidpod/solidpod.dart';
 import 'package:solidui/solidui.dart' show SolidProfileCropDialog;
 
+import 'package:mypod/dialogs/edit_app_profile_views.dart';
+
 // This dialog edits the profile of ONE app/domain folder on the user's Pod,
 // independently of every other app. Each app keeps its own profile under its
 // own folder, encrypted (when the app uses encryption) with that app's own
@@ -112,7 +114,7 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
 
   // Editing state.
 
-  late final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
   Uint8List? _pendingAvatar;
   bool _avatarRemoved = false;
   bool _isSaving = false;
@@ -320,21 +322,19 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
         child: Padding(
           padding: const EdgeInsets.all(24),
-          child: _buildBody(theme),
+          child: _buildBody(),
         ),
       ),
     );
   }
 
-  Widget _buildBody(ThemeData theme) {
+  Widget _buildBody() {
     switch (_stage) {
       case _Stage.checking:
         return const Padding(
@@ -342,265 +342,31 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
           child: Center(child: CircularProgressIndicator()),
         );
       case _Stage.enterKey:
-        return _buildKeyEntry(theme);
-      case _Stage.editing:
-        return _buildEditor(theme);
-    }
-  }
-
-  // Security-key entry.
-
-  Widget _buildKeyEntry(ThemeData theme) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Text(
-          'Unlock ${widget.appName}',
-          style:
-              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
-        Text(
-          'This app\'s profile is encrypted. Enter its security key to view '
-          'and edit it.',
-          style: theme.textTheme.bodyMedium,
-        ),
-        const SizedBox(height: 20),
-        TextField(
+        return SecurityKeyPrompt(
+          appName: widget.appName,
           controller: _keyController,
-          obscureText: true,
-          autofocus: true,
-          enabled: !_verifying,
-          onSubmitted: (_) => _verifying ? null : _submitKey(),
-          decoration: InputDecoration(
-            labelText: 'Security key',
-            errorText: _keyError,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            prefixIcon: const Icon(Icons.key_outlined),
-          ),
-        ),
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: _verifying ? null : () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: _verifying ? null : _submitKey,
-              child: _verifying
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Unlock'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // Profile editor.
-
-  Widget _buildEditor(ThemeData theme) {
-    final hasAvatar = _pendingAvatar != null && _pendingAvatar!.isNotEmpty;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          widget.appName,
-          style:
-              theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-          textAlign: TextAlign.center,
-        ),
-        Text(
-          'Edit Profile',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        if (_loadError != null) ...[
-          Text(
-            _loadError!,
-            style: theme.textTheme.bodySmall
-                ?.copyWith(color: theme.colorScheme.error),
-          ),
-          const SizedBox(height: 12),
-        ],
-
-        // Avatar preview.
-
-        Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: theme.colorScheme.surfaceContainerHighest,
-            image: hasAvatar
-                ? DecorationImage(
-                    image: MemoryImage(_pendingAvatar!),
-                    fit: BoxFit.cover,
-                  )
-                : null,
-          ),
-          child: hasAvatar
-              ? null
-              : Icon(
-                  Icons.person,
-                  size: 64,
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          alignment: WrapAlignment.center,
-          children: [
-            TextButton.icon(
-              onPressed: _isSaving ? null : _pickImage,
-              icon: const Icon(Icons.upload, size: 18),
-              label: Text(hasAvatar ? 'Change Photo' : 'Upload Photo'),
-            ),
-            if (hasAvatar)
-              TextButton.icon(
-                onPressed: _isSaving ? null : _removeAvatar,
-                icon: Icon(
-                  Icons.delete_outline,
-                  size: 18,
-                  color: theme.colorScheme.error,
-                ),
-                label: Text(
-                  'Remove',
-                  style: TextStyle(color: theme.colorScheme.error),
-                ),
-              ),
-          ],
-        ),
-
-        const SizedBox(height: 20),
-
-        // Display name input.
-
-        TextField(
-          controller: _nameController,
-          enabled: !_isSaving,
-          decoration: InputDecoration(
-            labelText: 'Display Name',
-            hintText: 'Enter the display name',
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            prefixIcon: const Icon(Icons.badge_outlined),
-          ),
-          textCapitalization: TextCapitalization.words,
-          onChanged: (_) => setState(() {}),
-        ),
-
-        const SizedBox(height: 16),
-
-        _buildPrivacySelector(theme),
-
-        const SizedBox(height: 24),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            const SizedBox(width: 8),
-            FilledButton(
-              onPressed: (_isSaving || !_hasChanges) ? null : _save,
-              child: _isSaving
-                  ? const SizedBox(
-                      width: 18,
-                      height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Save'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  // Visibility selector. Disabled (forced public) when the app has no
-  // encryption set up, since storing a private profile requires the app's
-  // own encryption keys.
-
-  Widget _buildPrivacySelector(ThemeData theme) {
-    final summary = !_hasEncryption
-        ? 'This app has no encryption, so its profile is public (plaintext).'
-        : _private
-            ? 'Encrypted on the Pod with this app\'s key; only you can read it.'
-            : 'Stored as plaintext linked data; readable by anyone with the URL.';
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        border: Border.all(color: theme.dividerColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                _private ? Icons.lock_outline : Icons.public,
-                size: 18,
-                color: theme.colorScheme.onSurface,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Profile visibility',
-                style: theme.textTheme.bodyMedium
-                    ?.copyWith(fontWeight: FontWeight.w600),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          SegmentedButton<bool>(
-            segments: const [
-              ButtonSegment(
-                value: true,
-                label: Text('Private'),
-                icon: Icon(Icons.lock_outline, size: 16),
-              ),
-              ButtonSegment(
-                value: false,
-                label: Text('Public'),
-                icon: Icon(Icons.public, size: 16),
-              ),
-            ],
-            selected: {_private},
-            onSelectionChanged: (_isSaving || !_hasEncryption)
-                ? null
-                : (values) => setState(() => _private = values.first),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            summary,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
-    );
+          verifying: _verifying,
+          errorText: _keyError,
+          onSubmit: _submitKey,
+          onCancel: () => Navigator.of(context).pop(),
+        );
+      case _Stage.editing:
+        return ProfileEditorForm(
+          appName: widget.appName,
+          loadError: _loadError,
+          pendingAvatar: _pendingAvatar,
+          hasEncryption: _hasEncryption,
+          private: _private,
+          isSaving: _isSaving,
+          hasChanges: _hasChanges,
+          nameController: _nameController,
+          onPickImage: _pickImage,
+          onRemoveAvatar: _removeAvatar,
+          onPrivacyChanged: (value) => setState(() => _private = value),
+          onNameChanged: () => setState(() {}),
+          onCancel: () => Navigator.of(context).pop(),
+          onSave: _save,
+        );
+    }
   }
 }
