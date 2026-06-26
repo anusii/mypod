@@ -40,7 +40,7 @@ const String appTitle = 'MyPod - Manage your Solid Pod';
 /// `web/client-profile.jsonld` in this repository and is published with the
 /// web build.
 
-const String clientId = 'https://dev.empwr.au/mypod/client-profile.jsonld';
+const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
 
 /// Redirect URIs offered to the Solid-OIDC flow, one format per platform.
 ///
@@ -52,7 +52,7 @@ const String clientId = 'https://dev.empwr.au/mypod/client-profile.jsonld';
 /// in the client identifier document's `redirect_uris`.
 
 const List<String> redirectUris = [
-  'https://dev.empwr.au/mypod/redirect.html',
+  'https://anusii.github.io/mypod/redirect.html',
   'http://localhost:4400/redirect',
   'com.togaware.mypod://redirect',
 ];
@@ -63,7 +63,7 @@ const List<String> redirectUris = [
 /// document's `post_logout_redirect_uris`.
 
 const List<String> postLogoutRedirectUris = [
-  'https://dev.empwr.au/mypod/redirect.html',
+  'https://anusii.github.io/mypod/redirect.html',
   'http://localhost:4400/redirect',
   'com.togaware.mypod://redirect',
 ];
@@ -71,7 +71,7 @@ const List<String> postLogoutRedirectUris = [
 /// Public URL where MyPod is hosted. Used by the Invite Others
 /// feature to send a working link to the recipient.
 
-const String appUrl = 'https://dev.empwr.au/mypod/';
+const String appUrl = 'https://anusii.github.io/mypod/';
 
 /// Application-wide Invite Others configuration shared by the
 /// AppBar share button and the App Info dialog so that users can
