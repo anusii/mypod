@@ -128,8 +128,8 @@ class AppScaffold extends StatelessWidget {
         - Change the password of your Solid account on the server
         - List all domains (apps) hosted on your Solid server
         - Edit each app profile, display name, visibility, and avatar
-        - Theme switching (light / dark / system)
-        - Responsive navigation (rail and drawer)
+        - Backup, Archive, Restore, or Delete domains
+        - Archived domains can have descriptive notes
 
         For more information, visit the
         [MyPod](https://github.com/anusii/mypod) GitHub repository and our
