@@ -95,25 +95,20 @@ class ArchiveTile extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          TextButton.icon(
+          IconButton(
             onPressed: onEditNote,
             icon: const Icon(Icons.edit_note),
-            label: Text(hasNote ? 'Edit Note' : 'Add Note'),
+            tooltip: hasNote ? 'Edit Note' : 'Add Note',
           ),
-          const SizedBox(width: 4),
-          TextButton.icon(
+          IconButton(
             onPressed: clash ? null : onRestore,
             icon: const Icon(Icons.unarchive_outlined),
-            label: const Text('Restore'),
+            tooltip: 'Restore',
           ),
-          const SizedBox(width: 4),
-          TextButton.icon(
+          IconButton(
             onPressed: onDelete,
             icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-            label: Text(
-              'Delete',
-              style: TextStyle(color: theme.colorScheme.error),
-            ),
+            tooltip: 'Delete',
           ),
         ],
       ),

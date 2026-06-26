@@ -5,6 +5,7 @@ includes a short user-oriented description.
 
 ## 0.1 First Beta Release
 
++ UX updates better for narrow screens [0.1.4 20260626 gjw]
 + Add an ARCHIVE/BACKUP feature [0.1.3 20260626 gjw]
 + Filter out non-domains from domain list [0.1.2 20260626 tonypioneer]
 + Cleanup UX [0.1.1 20260624 gjw]

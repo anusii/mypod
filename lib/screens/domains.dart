@@ -210,9 +210,13 @@ class _DomainsState extends State<Domains> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Every app that stores data on your Pod appears as a folder '
-                  'under your Pod root. The list below is derived from those '
-                  'folders.',
+                  'Every app that stores data on the Pod server appears as a folder '
+                  'under your Pod root, which we call a domain. The list below is derived from those '
+                  'folders in your Pod server. Tap a button to edit the profile of a domain, '
+                  'to backup a domain (into the Archive on the Pod server), or to archive the domain,'
+                  'so that it is no longer listed here or available to the apps. This latter operation '
+                  'allows you to start the app again with a fresh/empty pod. The domain '
+                  'can be restored at a later time as you wish.',
                   style: theme.textTheme.bodyMedium,
                 ),
                 if (_podRoot != null) ...[
@@ -287,21 +291,19 @@ class _DomainsState extends State<Domains> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextButton.icon(
+                  IconButton(
                     onPressed: () => _editProfile(domains[i]),
                     icon: const Icon(Icons.edit),
-                    label: const Text('Edit Profile'),
+                    tooltip: 'Edit Profile',
                   ),
-                  const SizedBox(width: 4),
-                  TextButton.icon(
+                  IconButton(
                     onPressed: () async {
                       await backupDomainAction(context, domains[i]);
                     },
                     icon: const Icon(Icons.save_alt),
-                    label: const Text('Backup'),
+                    tooltip: 'Backup',
                   ),
-                  const SizedBox(width: 4),
-                  TextButton.icon(
+                  IconButton(
                     onPressed: () async {
                       final refresh = await archiveDomainAction(
                         context,
@@ -310,7 +312,7 @@ class _DomainsState extends State<Domains> {
                       if (refresh && mounted) await _loadDomains();
                     },
                     icon: const Icon(Icons.archive_outlined),
-                    label: const Text('Archive'),
+                    tooltip: 'Archive',
                   ),
                 ],
               ),
