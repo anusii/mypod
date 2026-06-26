@@ -30,6 +30,8 @@ import 'package:solidpod/solidpod.dart'
 import 'package:solidui/solidui.dart';
 
 import 'package:mypod/dialogs/edit_app_profile.dart';
+import 'package:mypod/screens/domain_actions.dart';
+import 'package:mypod/services/archive_service.dart';
 
 // Each top-level folder under a user's Pod root corresponds to an
 // app (a "domain") that has stored data on the Pod. This screen enumerates
@@ -148,7 +150,7 @@ class _DomainsState extends State<Domains> {
   // than POD applications (e.g. the `profile` container), so they are
   // excluded from the domains list.
 
-  static const Set<String> _reservedNames = {'profile'};
+  static const Set<String> _reservedNames = {'profile', archiveDirName};
 
   bool _isReservedName(String name) =>
       _reservedNames.contains(name.toLowerCase());
@@ -282,10 +284,35 @@ class _DomainsState extends State<Domains> {
               leading: const Icon(Icons.folder),
               title: Text(domains[i]),
               subtitle: const Text('App domain on your Pod'),
-              trailing: TextButton.icon(
-                onPressed: () => _editProfile(domains[i]),
-                icon: const Icon(Icons.edit),
-                label: const Text('Edit Profile'),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton.icon(
+                    onPressed: () => _editProfile(domains[i]),
+                    icon: const Icon(Icons.edit),
+                    label: const Text('Edit Profile'),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton.icon(
+                    onPressed: () async {
+                      await backupDomainAction(context, domains[i]);
+                    },
+                    icon: const Icon(Icons.save_alt),
+                    label: const Text('Backup'),
+                  ),
+                  const SizedBox(width: 4),
+                  TextButton.icon(
+                    onPressed: () async {
+                      final refresh = await archiveDomainAction(
+                        context,
+                        domains[i],
+                      );
+                      if (refresh && mounted) await _loadDomains();
+                    },
+                    icon: const Icon(Icons.archive_outlined),
+                    label: const Text('Archive'),
+                  ),
+                ],
               ),
             ),
           ],

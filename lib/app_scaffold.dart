@@ -28,6 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:solidui/solidui.dart';
 
 import 'package:mypod/constants/app.dart';
+import 'package:mypod/screens/archive.dart';
 import 'package:mypod/screens/domains.dart';
 import 'package:mypod/screens/manage_account.dart';
 
@@ -74,6 +75,20 @@ class AppScaffold extends StatelessWidget {
 
             ''',
           child: Domains(),
+        ),
+        SolidMenuItem(
+          icon: Icons.inventory_2_outlined,
+          title: 'Archive',
+          tooltip: '''
+
+            **Archive**
+
+            Tap here to view domains you have archived. You can restore an
+            archived domain (when no current domain of the same name exists)
+            or delete it permanently.
+
+            ''',
+          child: Archive(),
         ),
       ],
       appBar: SolidAppBarConfig(
