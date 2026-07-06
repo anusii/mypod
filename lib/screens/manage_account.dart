@@ -25,7 +25,7 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:solidpod/solidpod.dart' show getWebId, isUserLoggedIn;
+import 'package:solidpod/solidpod.dart' show isUserLoggedIn;
 import 'package:solidui/solidui.dart';
 
 import 'package:mypod/constants/app.dart';
@@ -44,37 +44,17 @@ class ManageAccount extends StatefulWidget {
 }
 
 class _ManageAccountState extends State<ManageAccount> {
-  // The server on which a new account should be created. Left empty initially
-  // and filled in from the logged-in user's server, since the target Solid
-  // server is not known ahead of time.
+  // The server on which a new account should be created. The [SolidServerField]
+  // below owns the initial value: it restores the user's last-used server from
+  // shared preferences (or falls back to the built-in default), exactly as the
+  // Solid login screen does, so no separate prefill logic is needed here.
 
   final TextEditingController _serverController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-
-    // Prefill the server field with the server of the currently
-    // logged-in WebID so that, in the common case, the user does not have to
-    // type it in.
-
-    _resolveCurrentServer();
-  }
 
   @override
   void dispose() {
     _serverController.dispose();
     super.dispose();
-  }
-
-  // Derive the server URL from the logged-in WebID and update the field.
-
-  Future<void> _resolveCurrentServer() async {
-    final webId = await getWebId();
-    final serverUri = WebIdParts.tryParse(webId)?.serverUri;
-    if (serverUri != null && mounted) {
-      setState(() => _serverController.text = serverUri);
-    }
   }
 
   // Open the create-account popup for the server in the text field.
@@ -208,14 +188,11 @@ class _ManageAccountState extends State<ManageAccount> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    TextField(
+                    // Reuse the same server selector as the Solid login screen.
+
+                    SolidServerField(
                       controller: _serverController,
-                      decoration: const InputDecoration(
-                        labelText: 'Solid server URL',
-                        hintText: 'https://your-solid-server',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.dns),
-                      ),
+                      themeMode: _serverFieldTheme(theme),
                     ),
                     const SizedBox(height: 12),
                     Align(
@@ -274,6 +251,20 @@ class _ManageAccountState extends State<ManageAccount> {
       ),
     );
   }
+}
+
+// Map the current Flutter [ThemeData] onto the colour slots that
+// [SolidServerField] expects.
+
+SolidLoginThemeMode _serverFieldTheme(ThemeData theme) {
+  final colours = theme.colorScheme;
+  return SolidLoginThemeMode(
+    backgroundColor: colours.surface,
+    cardColor: theme.cardColor,
+    textColor: colours.onSurface,
+    hintColor: theme.hintColor,
+    inputBorderColor: theme.dividerColor,
+  );
 }
 
 // A small presentation card grouping an icon, a heading, a description, and
