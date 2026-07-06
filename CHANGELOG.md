@@ -5,6 +5,7 @@ includes a short user-oriented description.
 
 ## 0.1 First Beta Release
 
++ Add web support [0.1.7 20260706 gjw]
 + Add winsows support siles [0.1.6 20260706 gjw]
 + Add list of common solid servers [0.1.5 20260706 tonypioneer]
 + UX updates better for narrow screens [0.1.4 20260626 gjw]
