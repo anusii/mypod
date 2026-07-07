@@ -40,20 +40,22 @@ const String appTitle = 'MyPod - Manage your Solid Pod';
 /// `web/client-profile.jsonld` in this repository and is published with the
 /// web build.
 
-const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
+const String clientId = 'https://mypod.solidcommunity.au/client-profile.jsonld';
 
 /// Redirect URIs offered to the Solid-OIDC flow, one format per platform.
 ///
 /// These are application redirect endpoints, not Pod server addresses.
-/// `pickRedirectUri` (from solidpod) selects the right one at runtime: the
-/// first `https://` entry for the web build (served from GitHub Pages, where
-/// `redirect.html` is same-origin), the custom scheme for Android/iOS/macOS,
-/// and the loopback entry for Windows/Linux. Every entry here must also appear
-/// in the client identifier document's `redirect_uris`.
+/// `pickRedirectUri` (from solidpod) selects the right one at runtime. On web
+/// it picks the entry whose origin equals the origin the app is served from,
+/// because `redirect.html` hands the auth response back via a same-origin
+/// `BroadcastChannel` — a mismatch leaves login hanging on the loading spinner.
+/// The custom scheme is used for Android/iOS/macOS and the loopback entry for
+/// Windows/Linux (and web debugging). Every entry here must also appear in the
+/// client identifier document's `redirect_uris`.
 
 const List<String> redirectUris = [
   'https://mypod.solidcommunity.au/redirect.html',
-  'http://localhost:4400/redirect',
+  'http://localhost:4400/redirect.html',
   'com.togaware.mypod://redirect',
 ];
 
@@ -64,7 +66,7 @@ const List<String> redirectUris = [
 
 const List<String> postLogoutRedirectUris = [
   'https://mypod.solidcommunity.au/redirect.html',
-  'http://localhost:4400/redirect',
+  'http://localhost:4400/redirect.html',
   'com.togaware.mypod://redirect',
 ];
 
