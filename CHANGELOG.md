@@ -5,6 +5,7 @@ includes a short user-oriented description.
 
 ## 0.1 First Beta Release
 
++ Macos and web oidc updates [0.1.9 20260707 tonypioneer]
 + Add macos supprot [0.1.8 20260706 gjw]
 + Add web support [0.1.7 20260706 gjw]
 + Add winsows support siles [0.1.6 20260706 gjw]
