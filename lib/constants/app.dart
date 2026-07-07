@@ -52,7 +52,7 @@ const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
 /// in the client identifier document's `redirect_uris`.
 
 const List<String> redirectUris = [
-  'https://anusii.github.io/mypod/redirect.html',
+  'https://mypod.solidcommunity.au/redirect.html',
   'http://localhost:4400/redirect',
   'com.togaware.mypod://redirect',
 ];
@@ -63,7 +63,7 @@ const List<String> redirectUris = [
 /// document's `post_logout_redirect_uris`.
 
 const List<String> postLogoutRedirectUris = [
-  'https://anusii.github.io/mypod/redirect.html',
+  'https://mypod.solidcommunity.au/redirect.html',
   'http://localhost:4400/redirect',
   'com.togaware.mypod://redirect',
 ];
