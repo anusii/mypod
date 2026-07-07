@@ -63,7 +63,7 @@ const List<String> redirectUris = [
 /// document's `post_logout_redirect_uris`.
 
 const List<String> postLogoutRedirectUris = [
-  'https://mypod.solidcommunity.au/mypod/redirect.html',
+  'https://mypod.solidcommunity.au/redirect.html',
   'http://localhost:4400/redirect',
   'com.togaware.mypod://redirect',
 ];
