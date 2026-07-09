@@ -1,7 +1,7 @@
 name: mypod
 description: MyPod - manage your Solid account, Pods, and app profiles.
 publish_to: 'none'
-version: 0.1.10+1
+version: 0.1.11+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -27,6 +27,8 @@ dependencies:
 dev_dependencies:
   flutter_launcher_icons: ^0.14.4
   flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
 
 flutter:
   assets:
