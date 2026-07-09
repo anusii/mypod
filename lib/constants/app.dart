@@ -23,6 +23,8 @@
 
 library;
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 import 'package:solidui/solidui.dart' show SolidInviteOthersConfig;
 
 /// Application title displayed as the window title.
@@ -40,35 +42,58 @@ const String appTitle = 'MyPod - Manage your Solid Pod';
 /// `web/client-profile.jsonld` in this repository and is published with the
 /// web build.
 
-const String clientId = 'https://mypod.solidcommunity.au/client-profile.jsonld';
+const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
 
 /// Redirect URIs offered to the Solid-OIDC flow, one format per platform.
 ///
 /// These are application redirect endpoints, not Pod server addresses.
-/// `pickRedirectUri` (from solidpod) selects the right one at runtime. On web
-/// it picks the entry whose origin equals the origin the app is served from,
-/// because `redirect.html` hands the auth response back via a same-origin
-/// `BroadcastChannel` — a mismatch leaves login hanging on the loading spinner.
-/// The custom scheme is used for Android/iOS/macOS and the loopback entry for
-/// Windows/Linux (and web debugging). Every entry here must also appear in the
-/// client identifier document's `redirect_uris`.
+/// `pickRedirectUri` (from solidpod) selects one at runtime by *format*: on web
+/// it returns the first `https://` entry (falling back to the first entry when
+/// none is `https://`), on Android/iOS/macOS the custom-scheme entry, and on
+/// Windows/Linux the `http://localhost` loopback entry.
+///
+/// On web the chosen redirect MUST be same-origin as wherever the app is being
+/// served, because `redirect.html` hands the auth response back through a
+/// same-origin `BroadcastChannel`; any origin mismatch leaves login hanging on
+/// the loading spinner. Crucially, `pickRedirectUri` does NOT match on origin —
+/// it just takes the first `https://` entry — so a hard-coded remote `https`
+/// URI would always be picked even while debugging at `http://localhost:4400`,
+/// producing exactly that hang. We therefore derive the web entry from
+/// `Uri.base.origin` at runtime: it resolves to
+/// `https://mypod.solidcommunity.au/redirect.html` for the deployed build and to
+/// `http://localhost:4400/redirect.html` under
+/// `flutter run -d chrome --web-port=4400`. For the localhost case there is no
+/// `https://` entry, so `pickRedirectUri` falls back to this single (loopback)
+/// entry — keeping the redirect same-origin either way.
+///
+/// Off the web the list is static: the custom scheme serves Android/iOS/macOS
+/// and the loopback entry serves Windows/Linux. Every runtime redirect must
+/// also appear in the client identifier document's `redirect_uris`.
 
-const List<String> redirectUris = [
-  'https://mypod.solidcommunity.au/redirect.html',
-  'http://localhost:4400/redirect.html',
-  'com.togaware.mypod://redirect',
-];
+List<String> get redirectUris {
+  if (kIsWeb) {
+    return ['${Uri.base.origin}/redirect.html'];
+  }
+  return const [
+    'com.togaware.mypod://redirect',
+    'http://localhost:4400/redirect.html',
+  ];
+}
 
 /// Post-logout redirect URIs offered to the Solid-OIDC flow.
 ///
-/// Mirrors [redirectUris] and must likewise match the client identifier
-/// document's `post_logout_redirect_uris`.
+/// Mirrors [redirectUris] (same origin-aware web derivation) and must likewise
+/// match the client identifier document's `post_logout_redirect_uris`.
 
-const List<String> postLogoutRedirectUris = [
-  'https://mypod.solidcommunity.au/redirect.html',
-  'http://localhost:4400/redirect.html',
-  'com.togaware.mypod://redirect',
-];
+List<String> get postLogoutRedirectUris {
+  if (kIsWeb) {
+    return ['${Uri.base.origin}/redirect.html'];
+  }
+  return const [
+    'com.togaware.mypod://redirect',
+    'http://localhost:4400/redirect.html',
+  ];
+}
 
 /// Public URL where MyPod is hosted. Used by the Invite Others
 /// feature to send a working link to the recipient.
