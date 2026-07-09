@@ -45,11 +45,13 @@ const String clientId = 'https://anusii.github.io/mypod/client-profile.jsonld';
 /// Redirect URIs offered to the Solid-OIDC flow, one format per platform.
 ///
 /// These are application redirect endpoints, not Pod server addresses.
-/// `pickRedirectUri` (from solidpod) selects the right one at runtime: the
-/// first `https://` entry for the web build (served from GitHub Pages, where
-/// `redirect.html` is same-origin), the custom scheme for Android/iOS/macOS,
-/// and the loopback entry for Windows/Linux. Every entry here must also appear
-/// in the client identifier document's `redirect_uris`.
+/// `pickRedirectUri` (from solidpod) selects the right one at runtime. If
+/// running the app on the web then it will use the first `https://` entry that
+/// is in the list. The location of the `redirect.html` file must be on the same
+/// server where the app for the web build is hosted to avoid a same-origin
+/// failure. The custom scheme for Android/iOS/macOS is the first entry with the
+/// , and the loopback entry for Windows/Linux. Every entry here must also
+/// appear in the client identifier document's `redirect_uris`.
 
 const List<String> redirectUris = [
   'https://mypod.solidcommunity.au/redirect.html',
