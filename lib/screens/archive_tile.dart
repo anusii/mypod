@@ -25,6 +25,8 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:markdown_tooltip/markdown_tooltip.dart';
+
 /// One row in the Archive list. Shows the archived folder name, an optional
 /// note, and Add/Edit Note, Restore and Delete actions. Restore is disabled
 /// when [clash] is true (a current domain of the same name exists).
@@ -55,22 +57,10 @@ class ArchiveTile extends StatelessWidget {
     final hasNote = note != null && note!.isNotEmpty;
 
     return ListTile(
-      isThreeLine: hasNote,
       leading: const Icon(Icons.inventory_2_outlined),
       title: Text(archivedName),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            clash
-                ? 'Cannot restore: a domain named "$originalName" already '
-                    'exists'
-                : 'Archived domain',
-            style: clash ? TextStyle(color: theme.colorScheme.error) : null,
-          ),
-          if (hasNote) ...[
-            const SizedBox(height: 4),
-            Row(
+      subtitle: hasNote
+          ? Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(
@@ -88,27 +78,72 @@ class ArchiveTile extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
-        ],
-      ),
+            )
+          : null,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          IconButton(
-            onPressed: onEditNote,
-            icon: const Icon(Icons.edit_note),
-            tooltip: hasNote ? 'Edit Note' : 'Add Note',
+          MarkdownTooltip(
+            message: hasNote
+                ? '''
+
+            **Edit Note**
+
+            Tap here to edit the note attached to this
+            archived domain.
+
+            '''
+                : '''
+
+            **Add Note**
+
+            Tap here to attach a note to this archived
+            domain, for example to record why it was archived.
+
+            ''',
+            child: IconButton(
+              onPressed: onEditNote,
+              icon: const Icon(Icons.edit_note),
+            ),
           ),
-          IconButton(
-            onPressed: clash ? null : onRestore,
-            icon: const Icon(Icons.unarchive_outlined),
-            tooltip: 'Restore',
+          MarkdownTooltip(
+            message: clash
+                ? '''
+
+            **Restore Unavailable**
+
+            A domain named *"$originalName"*
+            already exists on your Pod, so this archive cannot be
+            restored. Archive or delete the current *"$originalName"*
+            domain first.
+
+            '''
+                : '''
+
+            **Restore**
+
+            Tap here to restore this archived domain as
+            *"$originalName"*, making it available to its app again.
+
+            ''',
+            child: IconButton(
+              onPressed: clash ? null : onRestore,
+              icon: const Icon(Icons.unarchive_outlined),
+            ),
           ),
-          IconButton(
-            onPressed: onDelete,
-            icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
-            tooltip: 'Delete',
+          MarkdownTooltip(
+            message: '''
+
+            **Delete**
+
+            Tap here to permanently delete this archived
+            domain from your Pod. This cannot be undone.
+
+            ''',
+            child: IconButton(
+              onPressed: onDelete,
+              icon: Icon(Icons.delete_outline, color: theme.colorScheme.error),
+            ),
           ),
         ],
       ),

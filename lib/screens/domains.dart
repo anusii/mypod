@@ -25,6 +25,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart'
     show SolidConstants, getResourcesInContainer, getWebId, isUserLoggedIn;
 import 'package:solidui/solidui.dart';
@@ -201,10 +202,19 @@ class _DomainsState extends State<Domains> {
                         style: theme.textTheme.headlineSmall,
                       ),
                     ),
-                    IconButton(
-                      onPressed: _loading ? null : _loadDomains,
-                      icon: const Icon(Icons.refresh),
-                      tooltip: 'Refresh',
+                    MarkdownTooltip(
+                      message: '''
+
+                      **Refresh**
+
+                      Tap here to reload the list of app
+                      domains from your Pod.
+
+                      ''',
+                      child: IconButton(
+                        onPressed: _loading ? null : _loadDomains,
+                        icon: const Icon(Icons.refresh),
+                      ),
                     ),
                   ],
                 ),
@@ -291,28 +301,58 @@ class _DomainsState extends State<Domains> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    onPressed: () => _editProfile(domains[i]),
-                    icon: const Icon(Icons.edit),
-                    tooltip: 'Edit Profile',
+                  MarkdownTooltip(
+                    message: '''
+
+                    **Edit Profile**
+
+                    Tap here to edit this domain's app
+                    profile, including its display name, visibility, and
+                    avatar.
+
+                    ''',
+                    child: IconButton(
+                      onPressed: () => _editProfile(domains[i]),
+                      icon: const Icon(Icons.edit),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      await backupDomainAction(context, domains[i]);
-                    },
-                    icon: const Icon(Icons.save_alt),
-                    tooltip: 'Backup',
+                  MarkdownTooltip(
+                    message: '''
+
+                    **Backup**
+
+                    Tap here to take a dated backup of this
+                    domain into the Archive folder on your Pod. The domain
+                    remains available to its app.
+
+                    ''',
+                    child: IconButton(
+                      onPressed: () async {
+                        await backupDomainAction(context, domains[i]);
+                      },
+                      icon: const Icon(Icons.save_alt),
+                    ),
                   ),
-                  IconButton(
-                    onPressed: () async {
-                      final refresh = await archiveDomainAction(
-                        context,
-                        domains[i],
-                      );
-                      if (refresh && mounted) await _loadDomains();
-                    },
-                    icon: const Icon(Icons.archive_outlined),
-                    tooltip: 'Archive',
+                  MarkdownTooltip(
+                    message: '''
+
+                    **Archive**
+
+                    Tap here to move this domain into the
+                    Archive folder on your Pod so it is no longer available
+                    to its app. It can be restored later from the Archive.
+
+                    ''',
+                    child: IconButton(
+                      onPressed: () async {
+                        final refresh = await archiveDomainAction(
+                          context,
+                          domains[i],
+                        );
+                        if (refresh && mounted) await _loadDomains();
+                      },
+                      icon: const Icon(Icons.archive_outlined),
+                    ),
                   ),
                 ],
               ),

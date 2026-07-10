@@ -25,6 +25,7 @@ library;
 
 import 'package:flutter/material.dart';
 
+import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart' show isUserLoggedIn;
 
 import 'package:mypod/screens/archive_note_dialog.dart';
@@ -237,10 +238,19 @@ class _ArchiveState extends State<Archive> {
                         style: theme.textTheme.headlineSmall,
                       ),
                     ),
-                    IconButton(
-                      onPressed: _loading ? null : _loadArchive,
-                      icon: const Icon(Icons.refresh),
-                      tooltip: 'Refresh',
+                    MarkdownTooltip(
+                      message: '''
+
+                      **Refresh**
+
+                      Tap here to reload the list of archived
+                      domains from your Pod.
+
+                      ''',
+                      child: IconButton(
+                        onPressed: _loading ? null : _loadArchive,
+                        icon: const Icon(Icons.refresh),
+                      ),
                     ),
                   ],
                 ),
