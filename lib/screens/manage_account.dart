@@ -120,7 +120,7 @@ class _ManageAccountState extends State<ManageAccount> {
 
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
-        builder: (_) => const SolidPopupLogin(
+        builder: (_) => SolidPopupLogin(
           clientId: clientId,
           redirectUris: redirectUris,
           postLogoutRedirectUris: postLogoutRedirectUris,
