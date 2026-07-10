@@ -28,10 +28,10 @@ import 'package:flutter/material.dart';
 import 'package:markdown_tooltip/markdown_tooltip.dart';
 import 'package:solidpod/solidpod.dart' show isUserLoggedIn;
 
-import 'package:mypod/screens/archive_note_dialog.dart';
 import 'package:mypod/screens/archive_tile.dart';
-import 'package:mypod/services/archive_notes_service.dart';
+import 'package:mypod/screens/note_dialog.dart';
 import 'package:mypod/services/archive_service.dart';
+import 'package:mypod/services/notes_service.dart';
 
 // Lists the folders held under the Pod's `archive/` container — domains that
 // have previously been archived from the Domains screen. Each archived folder
@@ -81,7 +81,7 @@ class _ArchiveState extends State<Archive> {
 
       final archived = await ArchiveService.listArchived();
       final current = await ArchiveService.listCurrentDomains();
-      final notes = await ArchiveNotesService.loadNotes(force: true);
+      final notes = await archiveNotes.loadNotes(force: true);
 
       if (!mounted) return;
       setState(() {
@@ -129,7 +129,11 @@ class _ArchiveState extends State<Archive> {
 
     await _runBlocking('Restoring domain…', () async {
       final restored = await ArchiveService.restoreDomain(archivedName);
-      await ArchiveNotesService.removeNote(archivedName);
+
+      // Any note on the archive entry follows the folder back to the
+      // restored domain, where the Domains tab will show it.
+
+      await archiveNotes.transferNote(archivedName, domainNotes, restored);
       return 'Restored "$restored".';
     });
   }
@@ -164,7 +168,7 @@ class _ArchiveState extends State<Archive> {
 
     await _runBlocking('Deleting archive…', () async {
       await ArchiveService.deleteArchived(archivedName);
-      await ArchiveNotesService.removeNote(archivedName);
+      await archiveNotes.removeNote(archivedName);
       return 'Deleted "$archivedName".';
     });
   }
@@ -337,9 +341,9 @@ class _ArchiveState extends State<Archive> {
   // Add or edit the note for an archived entry, then refresh.
 
   Future<void> _editNote(String archivedName) async {
-    final saved = await showArchiveNoteDialog(context, archivedName);
+    final saved = await showNoteDialog(context, archivedName, archiveNotes);
     if (saved && mounted) {
-      final notes = await ArchiveNotesService.loadNotes(force: true);
+      final notes = await archiveNotes.loadNotes(force: true);
       if (mounted) setState(() => _notes = notes);
     }
   }

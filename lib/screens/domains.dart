@@ -32,7 +32,10 @@ import 'package:solidui/solidui.dart';
 
 import 'package:mypod/dialogs/edit_app_profile.dart';
 import 'package:mypod/screens/domain_actions.dart';
+import 'package:mypod/screens/domain_tile.dart';
+import 'package:mypod/screens/note_dialog.dart';
 import 'package:mypod/services/archive_service.dart';
+import 'package:mypod/services/notes_service.dart';
 
 // Each top-level folder under a user's Pod root corresponds to an
 // app (a "domain") that has stored data on the Pod. This screen enumerates
@@ -51,6 +54,10 @@ class _DomainsState extends State<Domains> {
   // The list of app/domain folder names discovered under the Pod root.
 
   List<String>? _domains;
+
+  // Notes the user has attached to domains, keyed by domain name.
+
+  Map<String, String> _notes = {};
 
   // Human-readable Pod root URL, shown as the source of the listing.
 
@@ -99,6 +106,8 @@ class _DomainsState extends State<Domains> {
       final (subDirs: subDirs, files: _) =
           await getResourcesInContainer(podRoot);
 
+      final notes = await domainNotes.loadNotes(force: true);
+
       // Keep only genuine POD applications. Some containers under the Pod
       // root are not apps but storage folders named with a UUID-style
       // hexadecimal code, or reserved folders such as `profile`; these are
@@ -114,6 +123,7 @@ class _DomainsState extends State<Domains> {
       setState(() {
         _podRoot = podRoot;
         _domains = names;
+        _notes = notes;
         _loading = false;
       });
     } catch (e) {
@@ -179,6 +189,16 @@ class _DomainsState extends State<Domains> {
       appRootUrl: appRootUrl,
       appName: domainName,
     );
+  }
+
+  // Add or edit the note for a domain, then refresh the notes shown.
+
+  Future<void> _editNote(String domainName) async {
+    final saved = await showNoteDialog(context, domainName, domainNotes);
+    if (saved) {
+      final notes = await domainNotes.loadNotes(force: true);
+      if (mounted) setState(() => _notes = notes);
+    }
   }
 
   @override
@@ -294,68 +314,21 @@ class _DomainsState extends State<Domains> {
         children: [
           for (var i = 0; i < domains.length; i++) ...[
             if (i > 0) const Divider(height: 1),
-            ListTile(
-              leading: const Icon(Icons.folder),
-              title: Text(domains[i]),
-              subtitle: const Text('App domain on your Pod'),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  MarkdownTooltip(
-                    message: '''
-
-                    **Edit Profile**
-
-                    Tap here to edit this domain's app
-                    profile, including its display name, visibility, and
-                    avatar.
-
-                    ''',
-                    child: IconButton(
-                      onPressed: () => _editProfile(domains[i]),
-                      icon: const Icon(Icons.edit),
-                    ),
-                  ),
-                  MarkdownTooltip(
-                    message: '''
-
-                    **Backup**
-
-                    Tap here to take a dated backup of this
-                    domain into the Archive folder on your Pod. The domain
-                    remains available to its app.
-
-                    ''',
-                    child: IconButton(
-                      onPressed: () async {
-                        await backupDomainAction(context, domains[i]);
-                      },
-                      icon: const Icon(Icons.save_alt),
-                    ),
-                  ),
-                  MarkdownTooltip(
-                    message: '''
-
-                    **Archive**
-
-                    Tap here to move this domain into the
-                    Archive folder on your Pod so it is no longer available
-                    to its app. It can be restored later from the Archive.
-
-                    ''',
-                    child: IconButton(
-                      onPressed: () async {
-                        final refresh = await archiveDomainAction(
-                          context,
-                          domains[i],
-                        );
-                        if (refresh && mounted) await _loadDomains();
-                      },
-                      icon: const Icon(Icons.archive_outlined),
-                    ),
-                  ),
-                ],
-              ),
+            DomainTile(
+              domainName: domains[i],
+              note: _notes[domains[i]],
+              onEditNote: () => _editNote(domains[i]),
+              onEditProfile: () => _editProfile(domains[i]),
+              onBackup: () async {
+                await backupDomainAction(context, domains[i]);
+              },
+              onArchive: () async {
+                final refresh = await archiveDomainAction(
+                  context,
+                  domains[i],
+                );
+                if (refresh && mounted) await _loadDomains();
+              },
             ),
           ],
         ],

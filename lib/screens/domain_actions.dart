@@ -26,8 +26,9 @@ library;
 
 import 'package:flutter/material.dart';
 
-import 'package:mypod/screens/archive_note_dialog.dart';
+import 'package:mypod/screens/note_dialog.dart';
 import 'package:mypod/services/archive_service.dart';
+import 'package:mypod/services/notes_service.dart';
 
 // ignore_for_file: use_build_context_synchronously
 
@@ -147,6 +148,11 @@ Future<bool> archiveDomainAction(
     failPrefix: 'Could not archive "$domainName"',
     action: () async {
       final name = await ArchiveService.archiveDomain(domainName);
+
+      // Any note on the domain follows the folder into the archive, where
+      // the Archive tab will show it against the dated entry.
+
+      await domainNotes.transferNote(domainName, archiveNotes, name);
       return (
         message: 'Archived "$domainName" as "$name".',
         folderName: name,
@@ -190,7 +196,8 @@ Future<bool> _runBlocking(
         content: Text(result.message),
         action: SnackBarAction(
           label: 'Add Note',
-          onPressed: () => showArchiveNoteDialog(context, result.folderName),
+          onPressed: () =>
+              showNoteDialog(context, result.folderName, archiveNotes),
         ),
         duration: const Duration(seconds: 8),
       ),

@@ -1,4 +1,4 @@
-/// MyPod - dialog for adding or editing a note on an archived domain.
+/// MyPod - dialog to add or edit the note attached to a Pod folder.
 ///
 /// Copyright (C) 2026, Software Innovation Institute, ANU.
 ///
@@ -19,25 +19,27 @@
 // You should have received a copy of the GNU General Public License along with
 // this program. If not, see <https://www.gnu.org/licenses/gpl-3.0.html>.
 ///
-/// Authors: Tony Chen
+/// Authors: Tony Chen, Graham Williams
 
 library;
 
 import 'package:flutter/material.dart';
 
-import 'package:mypod/services/archive_notes_service.dart';
+import 'package:mypod/services/notes_service.dart';
 
-/// Shows a dialog to add or edit the note for [archivedName]. The note is
-/// stored in MyPod's domain on the Pod. Returns true if the note was saved.
+/// Shows a dialog to add or edit the note for [name], stored via [notes]
+/// (the archive or domain notes store). The note is kept in MyPod's domain
+/// on the Pod. Returns true if the note was saved.
 
-Future<bool> showArchiveNoteDialog(
+Future<bool> showNoteDialog(
   BuildContext context,
-  String archivedName,
+  String name,
+  NotesService notes,
 ) async {
   // Load any existing note before showing the editor.
   String? existing;
   try {
-    existing = await ArchiveNotesService.noteFor(archivedName);
+    existing = await notes.noteFor(name);
   } catch (_) {
     existing = null;
   }
@@ -48,7 +50,7 @@ Future<bool> showArchiveNoteDialog(
   final saved = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
-      title: Text('Note for "$archivedName"'),
+      title: Text('Note for "$name"'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,7 +95,7 @@ Future<bool> showArchiveNoteDialog(
   controller.dispose();
 
   try {
-    await ArchiveNotesService.setNote(archivedName, text);
+    await notes.setNote(name, text);
     return true;
   } catch (e) {
     if (context.mounted) {

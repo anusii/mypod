@@ -5,6 +5,7 @@ includes a short user-oriented description.
 
 ## 0.1 First Beta Release
 
++ Remove redundent labesl in domains list [0.1.12 20260710 gjw]
 + Add a unit tests [0.1.11 20260710 gjw]
 + Remove redundant 'cannot restore' messages [0.1.10 20260710 gjw]
 + Macos and web oidc updates [0.1.9 20260707 tonypioneer]
