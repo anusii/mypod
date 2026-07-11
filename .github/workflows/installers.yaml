@@ -382,6 +382,15 @@ jobs:
           pwd
           ls -lh build/macos/Build/Products/Release
 
+      # 20260712 gjw Verify the ad-hoc signature Xcode applied during
+      # the build. If this fails here it would be SIGKILLed (Code
+      # Signature Invalid) on the user's Mac, so fail the build
+      # instead.
+
+      - name: Verify macOS app code signature
+        run: |
+          codesign --verify --deep --strict --verbose=2 \
+            "build/macos/Build/Products/Release/${{env.APP}}.app"
 
       # Package as DMG
 
@@ -406,23 +415,28 @@ jobs:
           path: ${{env.APP}}-macos.dmg
 
       # Package as ZIP
+      #
+      # 20260712 gjw Use ditto rather than zip (thedoctor0/zip-release)
+      # here. A .app relies on the symlinks inside its embedded
+      # frameworks (FlutterMacOS.framework etc) and plain zip does not
+      # preserve them, which breaks the code signature seal and the
+      # app is then SIGKILLed (Code Signature Invalid) on launch.
+      # ditto preserves symlinks, resource forks and permissions.
 
       - name: Create ZIP
-        uses: thedoctor0/zip-release@master
-        with:
-          type: 'zip'
-          directory: build/macos/Build/Products/Release
-          path: ${{env.APP}}.app
-          filename: ${{env.APP}}-macos.zip
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            "build/macos/Build/Products/Release/${{env.APP}}.app" \
+            "${{env.APP}}-macos.zip"
 
       - name: Review ZIP exists
-        run: ls -lh build/macos/Build/Products/Release
+        run: ls -lh ${{env.APP}}-macos.zip
 
       - name: Upload Artefact
         uses: actions/upload-artifact@v6
         with:
           name: ${{env.APP}}-macos-zip
-          path: build/macos/Build/Products/Release/${{env.APP}}-macos.zip
+          path: ${{env.APP}}-macos.zip
 
   ########################################################################
   # MACOS - UNSIGNED
