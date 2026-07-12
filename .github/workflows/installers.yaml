@@ -374,6 +374,29 @@ jobs:
         run: |
           rm -f macos/Podfile macos/project.yml
 
+      # 20260712 gjw keychain-access-groups is a restricted
+      # entitlement that requires a provisioning profile. With ad-hoc
+      # signing AMFI kills the app at launch (SIGKILL Code Signature
+      # Invalid) even though codesign --verify passes. On the mac you
+      # can strip the entitlements with `codesign --force --deep -s -
+      # /Applications/mypod.app`. We strip it here for the
+      # no-certificate build. Consequence: flutter_secure_storage, as
+      # utilised by solidpod utilises, cannot persist to the keychain,
+      # so the security key is not cached between sessions, resulting
+      # in a "press twice" beahviour rather than remembering it,
+      # inherent to no-certificate distribution. The Developer ID
+      # signed build keeps the entitlement and hence no "press twice"
+      # problem.
+
+      - name: Strip restricted entitlements (invalid with ad-hoc signing)
+        run: |
+          for f in macos/Runner/Release.entitlements macos/Runner/DebugProfile.entitlements; do
+            if /usr/libexec/PlistBuddy -c "Print :keychain-access-groups" "$f" >/dev/null 2>&1; then
+              /usr/libexec/PlistBuddy -c "Delete :keychain-access-groups" "$f"
+              echo "Removed keychain-access-groups from $f"
+            fi
+          done
+
       - name: Build Flutter macOS app
         run: flutter build macos --release
 
