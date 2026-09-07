@@ -254,7 +254,6 @@ ios/project-*.yml
 **/xcuserdata/
 
 # ios/macos generated project files
-macos/Runner.xcodeproj/
 macos/Runner.xcworkspace/
 macos/Runner/Info.plist
 
