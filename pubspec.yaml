@@ -18,10 +18,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  file_picker: ^11.0.2
+  file_picker: ^12.2.0
   markdown_tooltip: ^0.0.10
-  solidpod: ^1.0.13
-  solidui: ^1.0.18
+  solidpod: ^1.0.20
+  solidui: ^1.0.39
   window_manager: ^0.5.1
 
 dev_dependencies:

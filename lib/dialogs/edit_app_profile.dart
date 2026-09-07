@@ -239,15 +239,13 @@ class _EditAppProfileDialogState extends State<EditAppProfileDialog> {
   // Pick and crop a new avatar image.
 
   Future<void> _pickImage() async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['png', 'jpg', 'jpeg'],
-      withData: true,
     );
-    if (result == null || result.files.isEmpty) return;
+    if (file == null) return;
 
-    final bytes = result.files.first.bytes;
-    if (bytes == null) return;
+    final bytes = await file.readAsBytes();
 
     if (bytes.length > _maxProfilePictureBytes) {
       if (mounted) {
